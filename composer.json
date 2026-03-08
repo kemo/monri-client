@@ -1,0 +1,32 @@
+{
+    "name": "kemo/monri-client",
+    "description": "Monri payment gateway PHP client",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1",
+        "psr/http-client": "^1.0",
+        "psr/http-factory": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.0 || ^11.0",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "guzzlehttp/guzzle": "^7.0",
+        "symfony/cache": "^7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kemo\\Monri\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Kemo\\Monri\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "cs-check": "php-cs-fixer fix --dry-run --diff",
+        "cs-fix": "php-cs-fixer fix"
+    }
+}
