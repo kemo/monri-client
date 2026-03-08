@@ -23,7 +23,8 @@ final class Customer
         public readonly ?string $updatedAt = null,
         public readonly ?string $deletedAt = null,
         public readonly bool $deleted = false,
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {

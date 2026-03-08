@@ -15,7 +15,8 @@ final class Payments
         private readonly Config $config,
         private readonly HttpClientInterface $httpClient,
         private readonly RequestSigner $signer,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a new payment.

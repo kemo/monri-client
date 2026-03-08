@@ -15,7 +15,8 @@ final class PaymentResult
         public readonly string $transactionType,
         public readonly ?string $paymentMethod = null,
         public readonly ?string $responseMessage = null,
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {

@@ -11,7 +11,8 @@ final class PaymentStatus
         public readonly string $paymentStatus,
         public readonly string $clientSecret,
         public readonly ?PaymentResult $result = null,
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {

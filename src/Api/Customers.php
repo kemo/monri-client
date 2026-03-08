@@ -15,7 +15,8 @@ final class Customers
         private readonly Config $config,
         private readonly HttpClientInterface $httpClient,
         private readonly RequestSigner $signer,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a new customer.
@@ -132,7 +133,7 @@ final class Customers
         $data = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
 
         return array_map(
-            static fn(array $c) => Customer::fromArray($c),
+            static fn (array $c) => Customer::fromArray($c),
             $data['customers'] ?? $data,
         );
     }
@@ -168,7 +169,7 @@ final class Customers
         $data = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
 
         return array_map(
-            static fn(array $pm) => PaymentMethod::fromArray($pm),
+            static fn (array $pm) => PaymentMethod::fromArray($pm),
             $data['data'] ?? [],
         );
     }

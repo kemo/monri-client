@@ -11,7 +11,8 @@ final class Tokens
 {
     public function __construct(
         private readonly Config $config,
-    ) {}
+    ) {
+    }
 
     /**
      * Generate a temporary card tokenization token (used client-side).

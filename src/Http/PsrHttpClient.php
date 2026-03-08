@@ -17,7 +17,8 @@ final class PsrHttpClient implements HttpClientInterface
         private readonly ClientInterface $client,
         private readonly RequestFactoryInterface $requestFactory,
         private readonly StreamFactoryInterface $streamFactory,
-    ) {}
+    ) {
+    }
 
     public function get(string $url, array $headers = []): array
     {

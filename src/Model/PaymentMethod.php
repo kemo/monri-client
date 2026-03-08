@@ -17,7 +17,8 @@ final class PaymentMethod
         public readonly bool $expired = false,
         public readonly ?string $createdAt = null,
         public readonly ?string $updatedAt = null,
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {

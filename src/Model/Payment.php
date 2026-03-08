@@ -10,7 +10,8 @@ final class Payment
         public readonly string $id,
         public readonly string $clientSecret,
         public readonly string $status,
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {
