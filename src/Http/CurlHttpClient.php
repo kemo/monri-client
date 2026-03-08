@@ -39,9 +39,9 @@ final class CurlHttpClient implements HttpClientInterface
     {
         $ch = curl_init($url);
 
-        if ($ch === false) {
-            throw new NetworkException('Failed to initialize cURL');
-        }
+        if ($ch === false) { // @codeCoverageIgnore
+            throw new NetworkException('Failed to initialize cURL'); // @codeCoverageIgnore
+        } // @codeCoverageIgnore
 
         $responseHeaders = [];
 
