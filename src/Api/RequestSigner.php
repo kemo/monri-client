@@ -14,7 +14,9 @@ use Kemo\Monri\Config;
  */
 final class RequestSigner
 {
-    public function __construct(private readonly Config $config) {}
+    public function __construct(private readonly Config $config)
+    {
+    }
 
     /**
      * @param string $path     URL path only, e.g. "/v2/payment/new"

@@ -10,14 +10,23 @@ final class Payment
         public readonly string $id,
         public readonly string $clientSecret,
         public readonly string $status,
-    ) {}
+    ) {
+    }
 
+    /** @param array<string, mixed> $data */
     public static function fromArray(array $data): self
     {
+        /** @var string $id */
+        $id = $data['id'];
+        /** @var string $clientSecret */
+        $clientSecret = $data['client_secret'];
+        /** @var string $status */
+        $status = $data['status'];
+
         return new self(
-            id: $data['id'],
-            clientSecret: $data['client_secret'],
-            status: $data['status'],
+            id: $id,
+            clientSecret: $clientSecret,
+            status: $status,
         );
     }
 }

@@ -60,7 +60,7 @@ final class PaymentsTest extends TestCase
             ->with(
                 $this->stringContains('/v2/payment/new'),
                 $this->anything(),
-                $this->callback(fn($headers) => str_starts_with($headers['Authorization'] ?? '', 'WP3-v2.1 ')),
+                $this->callback(fn ($headers) => str_starts_with($headers['Authorization'] ?? '', 'WP3-v2.1 ')),
             )
             ->willReturn([
                 'status' => 200,
@@ -93,7 +93,7 @@ final class PaymentsTest extends TestCase
             ->method('post')
             ->with(
                 $this->anything(),
-                $this->callback(fn($body) => ($body['transaction_type'] ?? '') === 'purchase'),
+                $this->callback(fn ($body) => ($body['transaction_type'] ?? '') === 'purchase'),
                 $this->anything(),
             )
             ->willReturn([

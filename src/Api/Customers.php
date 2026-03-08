@@ -15,7 +15,8 @@ final class Customers
         private readonly Config $config,
         private readonly HttpClientInterface $httpClient,
         private readonly RequestSigner $signer,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a new customer.
@@ -30,7 +31,7 @@ final class Customers
      *     country?: string,
      *     zip_code?: string,
      *     address?: string,
-     *     metadata?: array,
+     *     metadata?: array<string, mixed>,
      * } $params
      */
     public function create(array $params): Customer
@@ -44,9 +45,10 @@ final class Customers
             ['Authorization' => $this->signer->header($path, $body)],
         );
 
-        return Customer::fromArray(
-            json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR),
-        );
+        /** @var array<string, mixed> $decoded */
+        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+
+        return Customer::fromArray($decoded);
     }
 
     /**
@@ -61,7 +63,7 @@ final class Customers
      *     country?: string,
      *     zip_code?: string,
      *     address?: string,
-     *     metadata?: array,
+     *     metadata?: array<string, mixed>,
      * } $params
      */
     public function update(string $uuid, array $params): Customer
@@ -75,9 +77,10 @@ final class Customers
             ['Authorization' => $this->signer->header($path, $body)],
         );
 
-        return Customer::fromArray(
-            json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR),
-        );
+        /** @var array<string, mixed> $decoded */
+        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+
+        return Customer::fromArray($decoded);
     }
 
     /**
@@ -92,9 +95,10 @@ final class Customers
             ['Authorization' => $this->signer->header($path)],
         );
 
-        return Customer::fromArray(
-            json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR),
-        );
+        /** @var array<string, mixed> $decoded */
+        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+
+        return Customer::fromArray($decoded);
     }
 
     /**
@@ -109,9 +113,10 @@ final class Customers
             ['Authorization' => $this->signer->header($path)],
         );
 
-        return Customer::fromArray(
-            json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR),
-        );
+        /** @var array<string, mixed> $decoded */
+        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+
+        return Customer::fromArray($decoded);
     }
 
     /**
@@ -129,11 +134,15 @@ final class Customers
             ['Authorization' => $this->signer->header($path)],
         );
 
+        /** @var array<string, mixed> $data */
         $data = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
 
+        /** @var list<array<string, mixed>> $customers */
+        $customers = $data['customers'] ?? $data;
+
         return array_map(
-            static fn(array $c) => Customer::fromArray($c),
-            $data['customers'] ?? $data,
+            static fn (array $c): Customer => Customer::fromArray($c),
+            $customers,
         );
     }
 
@@ -165,11 +174,15 @@ final class Customers
             ['Authorization' => $this->signer->header($path)],
         );
 
+        /** @var array<string, mixed> $data */
         $data = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
 
+        /** @var list<array<string, mixed>> $methods */
+        $methods = $data['data'] ?? [];
+
         return array_map(
-            static fn(array $pm) => PaymentMethod::fromArray($pm),
-            $data['data'] ?? [],
+            static fn (array $pm): PaymentMethod => PaymentMethod::fromArray($pm),
+            $methods,
         );
     }
 }

@@ -10,5 +10,6 @@ final class TempCardToken
         public readonly string $id,
         public readonly int $timestamp,
         public readonly string $digest,
-    ) {}
+    ) {
+    }
 }

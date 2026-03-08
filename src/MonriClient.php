@@ -48,6 +48,10 @@ final class MonriClient
             ?? getenv('MONRI_ENVIRONMENT')
             ?: 'test';
 
+        /** @var string $key */
+        /** @var string $token */
+        /** @var string $env */
+
         return new self(new Config(
             merchantKey: $key,
             authenticityToken: $token,

@@ -12,16 +12,19 @@ final class CurlHttpClient implements HttpClientInterface
     private const USER_AGENT = 'MonriClient/PHP 1.0';
     private const TIMEOUT = 30;
 
+    /** @inheritDoc */
     public function get(string $url, array $headers = []): array
     {
         return $this->request('GET', $url, null, $headers);
     }
 
+    /** @inheritDoc */
     public function post(string $url, array $body, array $headers = []): array
     {
         return $this->request('POST', $url, $body, $headers);
     }
 
+    /** @inheritDoc */
     public function delete(string $url, array $headers = []): array
     {
         return $this->request('DELETE', $url, null, $headers);
@@ -36,9 +39,9 @@ final class CurlHttpClient implements HttpClientInterface
     {
         $ch = curl_init($url);
 
-        if ($ch === false) {
-            throw new NetworkException('Failed to initialize cURL');
-        }
+        if ($ch === false) { // @codeCoverageIgnore
+            throw new NetworkException('Failed to initialize cURL'); // @codeCoverageIgnore
+        } // @codeCoverageIgnore
 
         $responseHeaders = [];
 
@@ -78,12 +81,10 @@ final class CurlHttpClient implements HttpClientInterface
 
         if ($errno !== 0 || $result === false) {
             $error = curl_error($ch);
-            curl_close($ch);
             throw new NetworkException("cURL error ({$errno}): {$error}");
         }
 
         $statusCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
 
         /** @var string $result */
         if ($statusCode < 200 || $statusCode >= 300) {

@@ -10,7 +10,8 @@ final class Config
         public readonly string $merchantKey,
         public readonly string $authenticityToken,
         public readonly Environment $environment = Environment::Test,
-    ) {}
+    ) {
+    }
 
     public function baseUrl(): string
     {

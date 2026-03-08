@@ -15,7 +15,8 @@ final class Payments
         private readonly Config $config,
         private readonly HttpClientInterface $httpClient,
         private readonly RequestSigner $signer,
-    ) {}
+    ) {
+    }
 
     /**
      * Create a new payment.
@@ -47,9 +48,10 @@ final class Payments
             ['Authorization' => $this->signer->header($path, $body)],
         );
 
-        return Payment::fromArray(
-            json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR),
-        );
+        /** @var array<string, mixed> $decoded */
+        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+
+        return Payment::fromArray($decoded);
     }
 
     /**
@@ -68,9 +70,10 @@ final class Payments
             ['Authorization' => $this->signer->header($path, $body)],
         );
 
-        return Payment::fromArray(
-            json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR),
-        );
+        /** @var array<string, mixed> $decoded */
+        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+
+        return Payment::fromArray($decoded);
     }
 
     /**
@@ -85,8 +88,9 @@ final class Payments
             ['Authorization' => $this->signer->header($path)],
         );
 
-        return PaymentStatus::fromArray(
-            json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR),
-        );
+        /** @var array<string, mixed> $decoded */
+        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+
+        return PaymentStatus::fromArray($decoded);
     }
 }

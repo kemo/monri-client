@@ -1,5 +1,7 @@
 # Monri PHP Client
 
+[![CI](https://github.com/kemo/monri-client/actions/workflows/ci.yml/badge.svg)](https://github.com/kemo/monri-client/actions/workflows/ci.yml)
+
 PHP client for the [Monri](https://monri.com) payment gateway. Supports PHP 8.1+.
 
 ## Installation
@@ -185,11 +187,15 @@ $http = new PsrHttpClient($guzzle, $requestFactory, $streamFactory);
 $client = new MonriClient($config, $http);
 ```
 
-## Testing
+## Development
 
 ```bash
-composer test
-composer cs-check
+composer test        # PHPUnit
+composer cs-check    # php-cs-fixer (dry-run)
+composer cs-fix      # php-cs-fixer (apply)
+composer phpcs       # PHP_CodeSniffer
+composer phpcbf      # PHP_CodeSniffer (auto-fix)
+composer phpstan     # PHPStan (level max)
 ```
 
 ## Environments
@@ -198,3 +204,7 @@ composer cs-check
 |---|---|
 | `Environment::Test` | `https://ipgtest.monri.com` |
 | `Environment::Production` | `https://ipg.monri.com` |
+
+## License
+
+MIT - see [LICENSE](LICENSE).
