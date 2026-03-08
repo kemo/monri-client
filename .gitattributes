@@ -8,5 +8,7 @@
 /.gitignore         export-ignore
 /.phpunit.result.cache export-ignore
 /phpunit.xml        export-ignore
+/phpstan.neon       export-ignore
+/phpcs.xml          export-ignore
 /tests              export-ignore
 /MIGRATION.md       export-ignore
