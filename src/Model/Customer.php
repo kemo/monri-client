@@ -6,6 +6,7 @@ namespace Kemo\Monri\Model;
 
 final class Customer
 {
+    /** @param array<string, mixed>|null $metadata */
     public function __construct(
         public readonly string $uuid,
         public readonly ?string $merchantCustomerId,
@@ -26,25 +27,57 @@ final class Customer
     ) {
     }
 
+    /** @param array<string, mixed> $data */
     public static function fromArray(array $data): self
     {
+        /** @var string $uuid */
+        $uuid = $data['uuid'];
+        /** @var string|null $merchantCustomerId */
+        $merchantCustomerId = $data['merchant_customer_id'] ?? null;
+        /** @var string|null $email */
+        $email = $data['email'] ?? null;
+        /** @var string|null $name */
+        $name = $data['name'] ?? null;
+        /** @var string|null $phone */
+        $phone = $data['phone'] ?? null;
+        /** @var string $status */
+        $status = $data['status'];
+        /** @var string|null $description */
+        $description = $data['description'] ?? null;
+        /** @var string|null $city */
+        $city = $data['city'] ?? null;
+        /** @var string|null $country */
+        $country = $data['country'] ?? null;
+        /** @var string|null $zipCode */
+        $zipCode = $data['zip_code'] ?? null;
+        /** @var string|null $address */
+        $address = $data['address'] ?? null;
+        /** @var array<string, mixed>|null $metadata */
+        $metadata = $data['metadata'] ?? null;
+        /** @var string|null $createdAt */
+        $createdAt = $data['created_at'] ?? null;
+        /** @var string|null $updatedAt */
+        $updatedAt = $data['updated_at'] ?? null;
+        /** @var string|null $deletedAt */
+        $deletedAt = $data['deleted_at'] ?? null;
+
         return new self(
-            uuid: $data['uuid'],
-            merchantCustomerId: $data['merchant_customer_id'] ?? null,
-            email: $data['email'] ?? null,
-            name: $data['name'] ?? null,
-            phone: $data['phone'] ?? null,
-            status: $data['status'],
-            description: $data['description'] ?? null,
-            city: $data['city'] ?? null,
-            country: $data['country'] ?? null,
-            zipCode: $data['zip_code'] ?? null,
-            address: $data['address'] ?? null,
-            metadata: $data['metadata'] ?? null,
-            createdAt: $data['created_at'] ?? null,
-            updatedAt: $data['updated_at'] ?? null,
-            deletedAt: $data['deleted_at'] ?? null,
-            deleted: (bool) ($data['deleted'] ?? false),
+            uuid: $uuid,
+            merchantCustomerId: $merchantCustomerId,
+            email: $email,
+            name: $name,
+            phone: $phone,
+            status: $status,
+            description: $description,
+            city: $city,
+            country: $country,
+            zipCode: $zipCode,
+            address: $address,
+            metadata: $metadata,
+            createdAt: $createdAt,
+            updatedAt: $updatedAt,
+            deletedAt: $deletedAt,
+            deleted: !empty($data['deleted']),
         );
     }
 }

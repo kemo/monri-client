@@ -12,16 +12,19 @@ final class CurlHttpClient implements HttpClientInterface
     private const USER_AGENT = 'MonriClient/PHP 1.0';
     private const TIMEOUT = 30;
 
+    /** @inheritDoc */
     public function get(string $url, array $headers = []): array
     {
         return $this->request('GET', $url, null, $headers);
     }
 
+    /** @inheritDoc */
     public function post(string $url, array $body, array $headers = []): array
     {
         return $this->request('POST', $url, $body, $headers);
     }
 
+    /** @inheritDoc */
     public function delete(string $url, array $headers = []): array
     {
         return $this->request('DELETE', $url, null, $headers);

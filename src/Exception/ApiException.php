@@ -6,6 +6,7 @@ namespace Kemo\Monri\Exception;
 
 final class ApiException extends MonriException
 {
+    /** @param array<string, list<string>> $responseHeaders */
     public function __construct(
         public readonly int $statusCode,
         public readonly string $responseBody,
@@ -20,9 +21,11 @@ final class ApiException extends MonriException
         );
     }
 
+    /** @return array<string, mixed> */
     public function decodedBody(): array
     {
         try {
+            /** @var array<string, mixed> */
             return json_decode($this->responseBody, true, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException) {
             return [];
