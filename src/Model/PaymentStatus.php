@@ -11,18 +11,29 @@ final class PaymentStatus
         public readonly string $paymentStatus,
         public readonly string $clientSecret,
         public readonly ?PaymentResult $result = null,
-    ) {}
+    ) {
+    }
 
+    /** @param array<string, mixed> $data */
     public static function fromArray(array $data): self
     {
-        $result = isset($data['payment_result'])
-            ? PaymentResult::fromArray($data['payment_result'])
+        /** @var array<string, mixed>|null $paymentResult */
+        $paymentResult = $data['payment_result'] ?? null;
+        $result = is_array($paymentResult)
+            ? PaymentResult::fromArray($paymentResult)
             : null;
 
+        /** @var string $status */
+        $status = $data['status'];
+        /** @var string $paymentStatus */
+        $paymentStatus = $data['payment_status'];
+        /** @var string $clientSecret */
+        $clientSecret = $data['client_secret'];
+
         return new self(
-            status: $data['status'],
-            paymentStatus: $data['payment_status'],
-            clientSecret: $data['client_secret'],
+            status: $status,
+            paymentStatus: $paymentStatus,
+            clientSecret: $clientSecret,
             result: $result,
         );
     }

@@ -17,18 +17,22 @@ final class PsrHttpClient implements HttpClientInterface
         private readonly ClientInterface $client,
         private readonly RequestFactoryInterface $requestFactory,
         private readonly StreamFactoryInterface $streamFactory,
-    ) {}
+    ) {
+    }
 
+    /** @inheritDoc */
     public function get(string $url, array $headers = []): array
     {
         return $this->request('GET', $url, null, $headers);
     }
 
+    /** @inheritDoc */
     public function post(string $url, array $body, array $headers = []): array
     {
         return $this->request('POST', $url, $body, $headers);
     }
 
+    /** @inheritDoc */
     public function delete(string $url, array $headers = []): array
     {
         return $this->request('DELETE', $url, null, $headers);
@@ -66,14 +70,17 @@ final class PsrHttpClient implements HttpClientInterface
         $statusCode = $response->getStatusCode();
         $responseBody = (string) $response->getBody();
 
+        /** @var array<string, list<string>> $responseHeaders */
+        $responseHeaders = $response->getHeaders();
+
         if ($statusCode < 200 || $statusCode >= 300) {
-            throw new ApiException($statusCode, $responseBody, $response->getHeaders());
+            throw new ApiException($statusCode, $responseBody, $responseHeaders);
         }
 
         return [
             'status' => $statusCode,
             'body' => $responseBody,
-            'headers' => $response->getHeaders(),
+            'headers' => $responseHeaders,
         ];
     }
 }

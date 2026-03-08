@@ -83,7 +83,7 @@ final class CustomersTest extends TestCase
             ->with(
                 $this->anything(),
                 $this->anything(),
-                $this->callback(fn($h) => str_starts_with($h['Authorization'] ?? '', 'WP3-v2.1 ')),
+                $this->callback(fn ($h) => str_starts_with($h['Authorization'] ?? '', 'WP3-v2.1 ')),
             )
             ->willReturn([
                 'status' => 200,
@@ -132,7 +132,9 @@ final class CustomersTest extends TestCase
         $httpClient = $this->createMock(HttpClientInterface::class);
         $httpClient->method('get')->willReturn([
             'status' => 200,
-            'body' => json_encode(['customers' => [$this->customerPayload(), $this->customerPayload(['uuid' => 'c2'])]]),
+            'body' => json_encode([
+                'customers' => [$this->customerPayload(), $this->customerPayload(['uuid' => 'c2'])],
+            ]),
             'headers' => [],
         ]);
 
