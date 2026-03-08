@@ -10,6 +10,10 @@
     <file>src/</file>
     <file>tests/</file>
 
+    <!-- Exclude standalone router scripts (side-effects by design) -->
+    <exclude-pattern>tests/Http/server_router.php</exclude-pattern>
+    <exclude-pattern>tests/MockServer/router.php</exclude-pattern>
+
     <arg name="colors"/>
     <arg value="sp"/>
 </ruleset>
