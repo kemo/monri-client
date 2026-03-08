@@ -15,6 +15,10 @@ jobs:
       fail-fast: false
       matrix:
         php: ["8.1", "8.2", "8.3", "8.4"]
+        coverage: [none]
+        include:
+          - php: "8.3"
+            coverage: pcov
 
     steps:
       - uses: actions/checkout@v4
@@ -24,13 +28,17 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: curl, json, mbstring, openssl
-          coverage: none
+          coverage: ${{ matrix.coverage }}
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist
 
       - name: Run tests
         run: composer test
+
+      - name: Generate coverage report
+        if: matrix.coverage == 'pcov'
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-text
 
   cs:
     name: Code style
@@ -50,3 +58,22 @@ jobs:
 
       - name: Check code style
         run: composer cs-check
+
+  phpcs:
+    name: PHP_CodeSniffer
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run PHP_CodeSniffer
+        run: composer phpcs

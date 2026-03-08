@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<ruleset name="MonriClient">
+    <description>PSR-12 coding standard for Monri Client</description>
+
+    <rule ref="PSR12">
+        <!-- php-cs-fixer handles anonymous class braces differently -->
+        <exclude name="PSR12.Classes.AnonClassDeclaration.OpenBraceSameLine"/>
+    </rule>
+
+    <file>src/</file>
+    <file>tests/</file>
+
+    <arg name="colors"/>
+    <arg value="sp"/>
+</ruleset>

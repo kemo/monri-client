@@ -78,12 +78,10 @@ final class CurlHttpClient implements HttpClientInterface
 
         if ($errno !== 0 || $result === false) {
             $error = curl_error($ch);
-            curl_close($ch);
             throw new NetworkException("cURL error ({$errno}): {$error}");
         }
 
         $statusCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
 
         /** @var string $result */
         if ($statusCode < 200 || $statusCode >= 300) {
