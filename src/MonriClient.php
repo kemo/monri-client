@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Kemo\Monri;
 
+use Kemo\Monri\Api\Callbacks;
 use Kemo\Monri\Api\Customers;
 use Kemo\Monri\Api\Payments;
 use Kemo\Monri\Api\RequestSigner;
@@ -20,6 +21,7 @@ final class MonriClient
     private ?Payments $payments = null;
     private ?Customers $customers = null;
     private ?Tokens $tokens = null;
+    private ?Callbacks $callbacks = null;
 
     public function __construct(
         private readonly Config $config,
@@ -80,6 +82,11 @@ final class MonriClient
     public function tokens(): Tokens
     {
         return $this->tokens ??= new Tokens($this->config);
+    }
+
+    public function callbacks(): Callbacks
+    {
+        return $this->callbacks ??= new Callbacks($this->config);
     }
 
     public function config(): Config

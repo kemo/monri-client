@@ -83,6 +83,35 @@ if ($status->result !== null) {
 }
 ```
 
+### Verify a webhook callback
+
+Monri signs every server-side callback with `Authorization: WP3-callback {digest}`
+where `digest = sha512(merchant_key + raw_body)`. Always verify before trusting
+the payload:
+
+```php
+$payload = $client->callbacks()->parse(
+    $request->getContent(),                     // raw body, exactly as received
+    $request->headers->get('Authorization'),    // full header value
+);
+// throws AuthenticationException on bad signature, MonriException on bad JSON
+
+if ($payload->isApproved()) {
+    echo $payload->orderNumber;
+    echo $payload->amount;        // int, minor units
+    echo $payload->approvalCode;
+    echo $payload->maskedPan;
+}
+```
+
+Use `verify()` instead of `parse()` when you only need a boolean check:
+
+```php
+if (!$client->callbacks()->verify($rawBody, $authorizationHeader)) {
+    // reject the request with 403
+}
+```
+
 ## Customers
 
 ### Create a customer

@@ -9,6 +9,7 @@ use Kemo\Monri\Api\RequestSigner;
 use Kemo\Monri\Config;
 use Kemo\Monri\Environment;
 use Kemo\Monri\Exception\ApiException;
+use Kemo\Monri\Exception\MonriException;
 use Kemo\Monri\Http\HttpClientInterface;
 use Kemo\Monri\Model\Payment;
 use Kemo\Monri\Model\PaymentStatus;
@@ -83,7 +84,85 @@ final class PaymentsTest extends TestCase
 
         $this->expectException(ApiException::class);
         $this->expectExceptionCode(422);
-        $payments->create(['order_number' => 'ORD-1', 'amount' => 100, 'currency' => 'EUR', 'order_info' => '']);
+        $payments->create(['order_number' => 'ORD-1', 'amount' => 100, 'currency' => 'EUR', 'order_info' => 'test']);
+    }
+
+    public function testCreateRejectsOverlongOrderInfoBeforeNetworkCall(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->never())->method('post');
+
+        $payments = new Payments($this->config, $httpClient, $this->signer);
+
+        $this->expectException(MonriException::class);
+        $this->expectExceptionMessage('order_info must be 3-100 characters');
+        $payments->create([
+            'order_number' => 'ORD-1',
+            'amount' => 100,
+            'currency' => 'EUR',
+            'order_info' => str_repeat('x', 101),
+        ]);
+    }
+
+    public function testCreateRejectsTooShortOrderInfo(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->never())->method('post');
+
+        $payments = new Payments($this->config, $httpClient, $this->signer);
+
+        $this->expectException(MonriException::class);
+        $payments->create(['order_number' => 'ORD-1', 'amount' => 100, 'currency' => 'EUR', 'order_info' => 'ab']);
+    }
+
+    public function testCreateRejectsOverlongOrderNumber(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->never())->method('post');
+
+        $payments = new Payments($this->config, $httpClient, $this->signer);
+
+        $this->expectException(MonriException::class);
+        $this->expectExceptionMessage('order_number must be 1-40 characters');
+        $payments->create([
+            'order_number' => str_repeat('x', 41),
+            'amount' => 100,
+            'currency' => 'EUR',
+            'order_info' => 'test',
+        ]);
+    }
+
+    public function testCreateRejectsNonPositiveAmount(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->never())->method('post');
+
+        $payments = new Payments($this->config, $httpClient, $this->signer);
+
+        $this->expectException(MonriException::class);
+        $this->expectExceptionMessage('amount must be a positive integer');
+        $payments->create(['order_number' => 'ORD-1', 'amount' => 0, 'currency' => 'EUR', 'order_info' => 'test']);
+    }
+
+    public function testCreateAcceptsUuidOrderNumber(): void
+    {
+        // Verified against ipgtest.monri.com: hyphenated UUIDs are accepted
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->method('post')->willReturn([
+            'status' => 200,
+            'body' => json_encode(['id' => 'p1', 'client_secret' => 's', 'status' => 'approved']),
+            'headers' => [],
+        ]);
+
+        $payments = new Payments($this->config, $httpClient, $this->signer);
+        $result = $payments->create([
+            'order_number' => '0f8fad5b-d9cb-469f-a165-70867728950e',
+            'amount' => 100,
+            'currency' => 'EUR',
+            'order_info' => 'test',
+        ]);
+
+        $this->assertSame('approved', $result->status);
     }
 
     public function testDefaultTransactionTypeIsPurchase(): void

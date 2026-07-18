@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kemo\Monri\Api;
 
 use Kemo\Monri\Config;
+use Kemo\Monri\Exception\MonriException;
 use Kemo\Monri\Http\HttpClientInterface;
 use Kemo\Monri\Model\Payment;
 use Kemo\Monri\Model\PaymentStatus;
@@ -38,6 +39,8 @@ final class Payments
     public function create(array $params): Payment
     {
         $params['transaction_type'] ??= 'purchase';
+
+        $this->assertValidCreateParams($params);
 
         $path = '/v2/payment/new';
         $body = json_encode($params, JSON_THROW_ON_ERROR);
@@ -92,5 +95,39 @@ final class Payments
         $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
 
         return PaymentStatus::fromArray($decoded);
+    }
+
+    /**
+     * Fail fast on constraints Monri enforces server-side, so callers get a
+     * clear exception before any network round-trip.
+     *
+     * @param array<string, mixed> $params
+     */
+    private function assertValidCreateParams(array $params): void
+    {
+        $orderInfo = $params['order_info'] ?? null;
+        if (\is_string($orderInfo)) {
+            $length = mb_strlen($orderInfo);
+            if ($length < 3 || $length > 100) {
+                throw new MonriException(
+                    sprintf('order_info must be 3-100 characters, got %d', $length),
+                );
+            }
+        }
+
+        $orderNumber = $params['order_number'] ?? null;
+        if (\is_string($orderNumber)) {
+            $length = mb_strlen($orderNumber);
+            if ($length < 1 || $length > 40) {
+                throw new MonriException(
+                    sprintf('order_number must be 1-40 characters, got %d', $length),
+                );
+            }
+        }
+
+        $amount = $params['amount'] ?? null;
+        if (\is_int($amount) && $amount < 1) {
+            throw new MonriException('amount must be a positive integer in minor units');
+        }
     }
 }

@@ -94,12 +94,12 @@ final class IntegrationTest extends TestCase
         $this->expectException(ApiException::class);
         $this->expectExceptionCode(422);
 
-        // Missing required fields
+        // Currency missing — passes client-side checks, rejected by the server
         $this->client->payments()->create([
             'order_number' => 'ORD-BAD',
-            'amount' => 0,
+            'amount' => 100,
             'currency' => '',
-            'order_info' => '',
+            'order_info' => 'Validation test',
         ]);
     }
 
