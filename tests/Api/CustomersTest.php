@@ -134,7 +134,7 @@ final class CustomersTest extends TestCase
         $httpClient->method('get')->willReturn([
             'status' => 200,
             'body' => json_encode([
-                'customers' => [$this->customerPayload(), $this->customerPayload(['uuid' => 'c2'])],
+                'data' => [$this->customerPayload(), $this->customerPayload(['uuid' => 'c2'])],
             ]),
             'headers' => [],
         ]);
@@ -159,7 +159,7 @@ final class CustomersTest extends TestCase
 
     public function testListReturnsEmptyArrayForEmptyEnvelope(): void
     {
-        $httpClient = $this->mockGetResponse(['customers' => []]);
+        $httpClient = $this->mockGetResponse(['data' => []]);
 
         $customers = new Customers($this->config, $httpClient, $this->signer);
 
@@ -285,5 +285,60 @@ final class CustomersTest extends TestCase
         $result = $customers->paymentMethods('cust-uuid-123');
 
         $this->assertSame([], $result);
+    }
+
+    /**
+     * Monri's WP3-v2.1 digest must cover the request-target exactly as sent,
+     * query string included; ipgtest returns 401 for path-only digests on
+     * query-string URLs (verified live 2026-07-19).
+     */
+    public function testListDigestCoversQueryString(): void
+    {
+        $this->assertDigestCoversRequestTarget(
+            '/v2/customers?limit=3&offset=0',
+            static fn (Customers $c) => $c->list(limit: 3, offset: 0),
+            ['data' => []],
+        );
+    }
+
+    public function testPaymentMethodsDigestCoversQueryString(): void
+    {
+        $this->assertDigestCoversRequestTarget(
+            '/v2/customers/cust-uuid-123/payment-methods?limit=50&offset=0',
+            static fn (Customers $c) => $c->paymentMethods('cust-uuid-123'),
+            ['status' => 'approved', 'data' => []],
+        );
+    }
+
+    /**
+     * @param callable(Customers): mixed $call
+     * @param array<string, mixed> $responsePayload
+     */
+    private function assertDigestCoversRequestTarget(string $expectedTarget, callable $call, array $responsePayload): void
+    {
+        $config = $this->config;
+
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->expects($this->once())
+            ->method('get')
+            ->with(
+                $this->identicalTo($config->baseUrl() . $expectedTarget),
+                $this->callback(function (array $headers) use ($config, $expectedTarget): bool {
+                    $parts = explode(' ', $headers['Authorization'] ?? '');
+                    if (count($parts) !== 4 || $parts[0] !== 'WP3-v2.1') {
+                        return false;
+                    }
+                    [, $token, $timestamp, $digest] = $parts;
+                    $expected = hash(
+                        'sha512',
+                        $config->merchantKey . $timestamp . $config->authenticityToken . $expectedTarget,
+                    );
+
+                    return $token === $config->authenticityToken && $digest === $expected;
+                }),
+            )
+            ->willReturn(['status' => 200, 'body' => json_encode($responsePayload), 'headers' => []]);
+
+        $call(new Customers($config, $httpClient, $this->signer));
     }
 }

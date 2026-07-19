@@ -123,19 +123,21 @@ final class Customers
      */
     public function list(int $limit = 50, int $offset = 0): array
     {
-        $path = '/v2/customers';
-        $query = http_build_query(['limit' => $limit, 'offset' => $offset]);
+        // The digest must cover the request-target exactly as sent, query
+        // string included: ipgtest returns 401 for a path-only digest on a
+        // query-string URL (verified live 2026-07-19).
+        $target = '/v2/customers?' . http_build_query(['limit' => $limit, 'offset' => $offset]);
 
         $response = $this->httpClient->get(
-            $this->config->baseUrl() . $path . '?' . $query,
-            ['Authorization' => $this->signer->header($path)],
+            $this->config->baseUrl() . $target,
+            ['Authorization' => $this->signer->header($target)],
         );
 
         $data = ResponseParser::decode($response['body']);
 
         return array_map(
             static fn (array $c): Customer => Customer::fromArray($c),
-            self::extractList($data, 'customers'),
+            self::extractList($data, 'data'),
         );
     }
 
@@ -159,12 +161,13 @@ final class Customers
      */
     public function paymentMethods(string $customerUuid, int $limit = 50, int $offset = 0): array
     {
-        $path = '/v2/customers/' . rawurlencode($customerUuid) . '/payment-methods';
-        $query = http_build_query(['limit' => $limit, 'offset' => $offset]);
+        // Query string is part of the signed request-target, same as list().
+        $target = '/v2/customers/' . rawurlencode($customerUuid) . '/payment-methods?'
+            . http_build_query(['limit' => $limit, 'offset' => $offset]);
 
         $response = $this->httpClient->get(
-            $this->config->baseUrl() . $path . '?' . $query,
-            ['Authorization' => $this->signer->header($path)],
+            $this->config->baseUrl() . $target,
+            ['Authorization' => $this->signer->header($target)],
         );
 
         $data = ResponseParser::decode($response['body']);

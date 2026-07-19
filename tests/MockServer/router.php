@@ -256,7 +256,7 @@ if ($method === 'GET' && $uri === '/v2/customers') {
 
     $slice = array_slice($all, $offset, $limit);
 
-    jsonResponse(200, ['customers' => $slice]);
+    jsonResponse(200, ['data' => $slice]);
     return;
 }
 
