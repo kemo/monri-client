@@ -87,6 +87,40 @@ final class PaymentsTest extends TestCase
         $payments->create(['order_number' => 'ORD-1', 'amount' => 100, 'currency' => 'EUR', 'order_info' => 'test']);
     }
 
+    /**
+     * A proxy or WAF can return an HTML error page with a 200, which used to
+     * escape as a bare \JsonException - outside the MonriException hierarchy.
+     */
+    public function testStatusThrowsMonriExceptionOnNonJsonBody(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->method('get')->willReturn([
+            'status' => 200,
+            'body' => '<html><body>502 Bad Gateway</body></html>',
+            'headers' => [],
+        ]);
+
+        $payments = new Payments($this->config, $httpClient, $this->signer);
+
+        $this->expectException(MonriException::class);
+        $payments->status('pay-123');
+    }
+
+    public function testCreateThrowsMonriExceptionOnTruncatedBody(): void
+    {
+        $httpClient = $this->createMock(HttpClientInterface::class);
+        $httpClient->method('post')->willReturn([
+            'status' => 200,
+            'body' => '{"id":"pay-1","status":"appro',
+            'headers' => [],
+        ]);
+
+        $payments = new Payments($this->config, $httpClient, $this->signer);
+
+        $this->expectException(MonriException::class);
+        $payments->create(['order_number' => 'ORD-1', 'amount' => 100, 'currency' => 'EUR', 'order_info' => 'test']);
+    }
+
     public function testCreateRejectsOverlongOrderInfoBeforeNetworkCall(): void
     {
         $httpClient = $this->createMock(HttpClientInterface::class);

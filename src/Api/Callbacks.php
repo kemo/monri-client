@@ -66,17 +66,8 @@ final class Callbacks
             throw new AuthenticationException('Invalid Monri callback signature');
         }
 
-        try {
-            $decoded = json_decode($rawBody, true, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
-            throw new MonriException('Monri callback body is not valid JSON', 0, $e);
-        }
-
-        if (!\is_array($decoded)) {
-            throw new MonriException('Monri callback body is not a JSON object');
-        }
-
-        /** @var array<string, mixed> $decoded */
-        return CallbackPayload::fromArray($decoded);
+        return CallbackPayload::fromArray(
+            ResponseParser::decodeObject($rawBody, 'Monri callback body'),
+        );
     }
 }

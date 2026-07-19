@@ -51,8 +51,7 @@ final class Payments
             ['Authorization' => $this->signer->header($path, $body)],
         );
 
-        /** @var array<string, mixed> $decoded */
-        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+        $decoded = ResponseParser::decodeObject($response['body']);
 
         return Payment::fromArray($decoded);
     }
@@ -73,8 +72,7 @@ final class Payments
             ['Authorization' => $this->signer->header($path, $body)],
         );
 
-        /** @var array<string, mixed> $decoded */
-        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+        $decoded = ResponseParser::decodeObject($response['body']);
 
         return Payment::fromArray($decoded);
     }
@@ -91,8 +89,7 @@ final class Payments
             ['Authorization' => $this->signer->header($path)],
         );
 
-        /** @var array<string, mixed> $decoded */
-        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+        $decoded = ResponseParser::decodeObject($response['body']);
 
         return PaymentStatus::fromArray($decoded);
     }

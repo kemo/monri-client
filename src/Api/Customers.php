@@ -46,8 +46,7 @@ final class Customers
             ['Authorization' => $this->signer->header($path, $body)],
         );
 
-        /** @var array<string, mixed> $decoded */
-        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+        $decoded = ResponseParser::decodeObject($response['body']);
 
         return Customer::fromArray($decoded);
     }
@@ -78,8 +77,7 @@ final class Customers
             ['Authorization' => $this->signer->header($path, $body)],
         );
 
-        /** @var array<string, mixed> $decoded */
-        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+        $decoded = ResponseParser::decodeObject($response['body']);
 
         return Customer::fromArray($decoded);
     }
@@ -96,8 +94,7 @@ final class Customers
             ['Authorization' => $this->signer->header($path)],
         );
 
-        /** @var array<string, mixed> $decoded */
-        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+        $decoded = ResponseParser::decodeObject($response['body']);
 
         return Customer::fromArray($decoded);
     }
@@ -114,8 +111,7 @@ final class Customers
             ['Authorization' => $this->signer->header($path)],
         );
 
-        /** @var array<string, mixed> $decoded */
-        $decoded = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+        $decoded = ResponseParser::decodeObject($response['body']);
 
         return Customer::fromArray($decoded);
     }
@@ -135,8 +131,7 @@ final class Customers
             ['Authorization' => $this->signer->header($path)],
         );
 
-        /** @var array<mixed> $data */
-        $data = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+        $data = ResponseParser::decode($response['body']);
 
         return array_map(
             static fn (array $c): Customer => Customer::fromArray($c),
@@ -172,8 +167,7 @@ final class Customers
             ['Authorization' => $this->signer->header($path)],
         );
 
-        /** @var array<mixed> $data */
-        $data = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
+        $data = ResponseParser::decode($response['body']);
 
         return array_map(
             static fn (array $pm): PaymentMethod => PaymentMethod::fromArray($pm),
