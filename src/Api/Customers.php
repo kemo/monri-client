@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Kemo\Monri\Api;
 
 use Kemo\Monri\Config;
+use Kemo\Monri\Exception\MonriException;
 use Kemo\Monri\Http\HttpClientInterface;
 use Kemo\Monri\Model\Customer;
 use Kemo\Monri\Model\PaymentMethod;
@@ -134,15 +135,12 @@ final class Customers
             ['Authorization' => $this->signer->header($path)],
         );
 
-        /** @var array<string, mixed> $data */
+        /** @var array<mixed> $data */
         $data = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
-
-        /** @var list<array<string, mixed>> $customers */
-        $customers = $data['customers'] ?? $data;
 
         return array_map(
             static fn (array $c): Customer => Customer::fromArray($c),
-            $customers,
+            self::extractList($data, 'customers'),
         );
     }
 
@@ -174,15 +172,41 @@ final class Customers
             ['Authorization' => $this->signer->header($path)],
         );
 
-        /** @var array<string, mixed> $data */
+        /** @var array<mixed> $data */
         $data = json_decode($response['body'], true, 512, JSON_THROW_ON_ERROR);
-
-        /** @var list<array<string, mixed>> $methods */
-        $methods = $data['data'] ?? [];
 
         return array_map(
             static fn (array $pm): PaymentMethod => PaymentMethod::fromArray($pm),
-            $methods,
+            self::extractList($data, 'data'),
         );
+    }
+
+    /**
+     * Pull a list of records out of a response envelope.
+     *
+     * Accepts either {"<key>": [...]} or a bare top-level array. Anything else
+     * (an error object, a scalar under the envelope key, a list of scalars)
+     * would otherwise reach a typed callback and surface as a raw TypeError.
+     *
+     * @param array<mixed> $data
+     * @return list<array<string, mixed>>
+     * @throws MonriException
+     */
+    private static function extractList(array $data, string $key): array
+    {
+        $records = $data[$key] ?? (array_is_list($data) ? $data : null);
+
+        if (!is_array($records) || !array_is_list($records)) {
+            throw new MonriException(sprintf('Unexpected response shape: expected a list under "%s"', $key));
+        }
+
+        foreach ($records as $record) {
+            if (!is_array($record)) {
+                throw new MonriException(sprintf('Unexpected response shape: "%s" contains a non-object entry', $key));
+            }
+        }
+
+        /** @var list<array<string, mixed>> $records */
+        return $records;
     }
 }

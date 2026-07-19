@@ -9,6 +9,7 @@ use Kemo\Monri\Api\RequestSigner;
 use Kemo\Monri\Config;
 use Kemo\Monri\Environment;
 use Kemo\Monri\Exception\ApiException;
+use Kemo\Monri\Exception\MonriException;
 use Kemo\Monri\Http\HttpClientInterface;
 use Kemo\Monri\Model\Customer;
 use Kemo\Monri\Model\PaymentMethod;
@@ -143,6 +144,62 @@ final class CustomersTest extends TestCase
 
         $this->assertCount(2, $result);
         $this->assertInstanceOf(Customer::class, $result[0]);
+    }
+
+    public function testListAcceptsTopLevelArrayResponse(): void
+    {
+        $httpClient = $this->mockGetResponse([$this->customerPayload(), $this->customerPayload(['uuid' => 'c2'])]);
+
+        $customers = new Customers($this->config, $httpClient, $this->signer);
+        $result = $customers->list();
+
+        $this->assertCount(2, $result);
+        $this->assertSame('cust-uuid-123', $result[0]->uuid);
+    }
+
+    public function testListReturnsEmptyArrayForEmptyEnvelope(): void
+    {
+        $httpClient = $this->mockGetResponse(['customers' => []]);
+
+        $customers = new Customers($this->config, $httpClient, $this->signer);
+
+        $this->assertSame([], $customers->list());
+    }
+
+    public function testListThrowsMonriExceptionOnUnexpectedShape(): void
+    {
+        $httpClient = $this->mockGetResponse(['error' => 'something went wrong']);
+
+        $customers = new Customers($this->config, $httpClient, $this->signer);
+
+        $this->expectException(MonriException::class);
+        $this->expectExceptionMessage('Unexpected response shape');
+        $customers->list();
+    }
+
+    public function testPaymentMethodsThrowsMonriExceptionOnUnexpectedShape(): void
+    {
+        $httpClient = $this->mockGetResponse(['data' => 'not-a-list']);
+
+        $customers = new Customers($this->config, $httpClient, $this->signer);
+
+        $this->expectException(MonriException::class);
+        $this->expectExceptionMessage('Unexpected response shape');
+        $customers->paymentMethods('cust-uuid-123');
+    }
+
+    /**
+     * Behaviour change: this used to return [] via `$data['data'] ?? []`, which
+     * silently turned an unrecognised envelope into an empty result set.
+     */
+    public function testPaymentMethodsThrowsWhenEnvelopeKeyIsMissing(): void
+    {
+        $httpClient = $this->mockGetResponse(['total' => 0]);
+
+        $customers = new Customers($this->config, $httpClient, $this->signer);
+
+        $this->expectException(MonriException::class);
+        $customers->paymentMethods('cust-uuid-123');
     }
 
     public function testDelete(): void
