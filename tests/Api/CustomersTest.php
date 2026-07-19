@@ -314,8 +314,11 @@ final class CustomersTest extends TestCase
      * @param callable(Customers): mixed $call
      * @param array<string, mixed> $responsePayload
      */
-    private function assertDigestCoversRequestTarget(string $expectedTarget, callable $call, array $responsePayload): void
-    {
+    private function assertDigestCoversRequestTarget(
+        string $expectedTarget,
+        callable $call,
+        array $responsePayload,
+    ): void {
         $config = $this->config;
 
         $httpClient = $this->createMock(HttpClientInterface::class);
