@@ -27,7 +27,7 @@ final class PsrHttpClient implements HttpClientInterface
     }
 
     /** @inheritDoc */
-    public function post(string $url, array $body, array $headers = []): array
+    public function post(string $url, string $body, array $headers = []): array
     {
         return $this->request('POST', $url, $body, $headers);
     }
@@ -39,11 +39,11 @@ final class PsrHttpClient implements HttpClientInterface
     }
 
     /**
-     * @param array<string, mixed>|null $body
+     * @param string|null $body Pre-serialized body, sent verbatim
      * @param array<string, string> $headers
      * @return array{status: int, body: string, headers: array<string, list<string>>}
      */
-    private function request(string $method, string $url, ?array $body, array $headers): array
+    private function request(string $method, string $url, ?string $body, array $headers): array
     {
         $request = $this->requestFactory->createRequest($method, $url)
             ->withHeader('Accept', 'application/json')
@@ -56,9 +56,7 @@ final class PsrHttpClient implements HttpClientInterface
         if ($body !== null) {
             $request = $request
                 ->withHeader('Content-Type', 'application/json')
-                ->withBody($this->streamFactory->createStream(
-                    json_encode($body, JSON_THROW_ON_ERROR),
-                ));
+                ->withBody($this->streamFactory->createStream($body));
         }
 
         try {

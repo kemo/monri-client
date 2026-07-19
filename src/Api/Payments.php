@@ -47,7 +47,7 @@ final class Payments
 
         $response = $this->httpClient->post(
             $this->config->baseUrl() . $path,
-            $params,
+            $body,
             ['Authorization' => $this->signer->header($path, $body)],
         );
 
@@ -68,7 +68,7 @@ final class Payments
 
         $response = $this->httpClient->post(
             $this->config->baseUrl() . $path,
-            $params,
+            $body,
             ['Authorization' => $this->signer->header($path, $body)],
         );
 

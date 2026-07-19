@@ -216,6 +216,22 @@ $http = new PsrHttpClient($guzzle, $requestFactory, $streamFactory);
 $client = new MonriClient($config, $http);
 ```
 
+You can also implement `HttpClientInterface` directly:
+
+```php
+interface HttpClientInterface
+{
+    public function get(string $url, array $headers = []): array;
+    public function post(string $url, string $body, array $headers = []): array;
+    public function delete(string $url, array $headers = []): array;
+}
+```
+
+`$body` arrives already serialized and **must be sent byte-for-byte**. The
+Monri request signature in the `Authorization` header is computed over exactly
+those bytes, so re-encoding or reformatting the payload produces a signature
+the gateway rejects.
+
 ## Development
 
 ```bash

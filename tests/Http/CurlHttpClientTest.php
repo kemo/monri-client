@@ -122,7 +122,7 @@ final class CurlHttpClientTest extends TestCase
     public function testPostSendsJsonBody(): void
     {
         $client = new CurlHttpClient();
-        $result = $client->post($this->url('/echo-body'), ['amount' => 500, 'currency' => 'EUR']);
+        $result = $client->post($this->url('/echo-body'), json_encode(['amount' => 500, 'currency' => 'EUR']));
 
         $decoded = json_decode($result['body'], true);
         $this->assertSame(500, $decoded['amount']);
@@ -136,7 +136,7 @@ final class CurlHttpClientTest extends TestCase
         $this->expectException(ApiException::class);
         $this->expectExceptionCode(400);
 
-        $client->post($this->url('/error/400'), ['data' => 'test']);
+        $client->post($this->url('/error/400'), json_encode(['data' => 'test']));
     }
 
     public function testDeleteReturnsSuccessfulResponse(): void

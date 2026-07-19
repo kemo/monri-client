@@ -130,7 +130,7 @@ final class PsrHttpClientTest extends TestCase
         $response = $this->mockSuccessResponse(200, '{"id":"p1"}');
         $this->psrClient->method('sendRequest')->willReturn($response);
 
-        $result = $this->client->post('https://example.com/api', ['amount' => 100]);
+        $result = $this->client->post('https://example.com/api', json_encode(['amount' => 100]));
 
         $this->assertSame(200, $result['status']);
         $this->assertSame('{"id":"p1"}', $result['body']);
@@ -149,7 +149,7 @@ final class PsrHttpClientTest extends TestCase
         $this->expectException(ApiException::class);
         $this->expectExceptionCode(500);
 
-        $this->client->post('https://example.com/api', ['data' => 'test']);
+        $this->client->post('https://example.com/api', json_encode(['data' => 'test']));
     }
 
     public function testPostThrowsNetworkExceptionOnClientException(): void
@@ -165,7 +165,7 @@ final class PsrHttpClientTest extends TestCase
 
         $this->expectException(NetworkException::class);
 
-        $this->client->post('https://example.com/api', ['data' => 'test']);
+        $this->client->post('https://example.com/api', json_encode(['data' => 'test']));
     }
 
     public function testDeleteReturnsSuccessfulResponse(): void

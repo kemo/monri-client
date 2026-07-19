@@ -206,7 +206,9 @@ final class PaymentsTest extends TestCase
             ->method('post')
             ->with(
                 $this->anything(),
-                $this->callback(fn ($body) => ($body['transaction_type'] ?? '') === 'purchase'),
+                $this->callback(
+                    fn (string $body) => (json_decode($body, true)['transaction_type'] ?? '') === 'purchase',
+                ),
                 $this->anything(),
             )
             ->willReturn([

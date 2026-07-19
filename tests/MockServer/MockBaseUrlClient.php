@@ -27,7 +27,7 @@ final class MockBaseUrlClient implements HttpClientInterface
     }
 
     /** @inheritDoc */
-    public function post(string $url, array $body, array $headers = []): array
+    public function post(string $url, string $body, array $headers = []): array
     {
         return $this->inner->post($this->rewrite($url), $body, $headers);
     }
