@@ -32,6 +32,15 @@ $client = MonriClient::fromEnv();
 
 Both credentials are available in the Monri merchant dashboard.
 
+## Transactions (capture, refund, void)
+
+The XML transaction-management API is available via `transactions()`:
+
+```php
+$result = $client->transactions()->refund('order-123', 5000, 'BAM');
+$result->isApproved(); // true, otherwise ApiException is thrown
+```
+
 ## Authentication
 
 All requests are signed using the documented `WP3-v2.1` digest scheme:

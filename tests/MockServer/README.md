@@ -18,6 +18,9 @@ All 10 Monri API v2 endpoints:
 | DELETE | `/v2/customers/{uuid}` | Delete customer (soft) |
 | GET | `/v2/merchants/customers/{id}` | Find by merchant customer ID |
 | GET | `/v2/customers/{uuid}/payment-methods` | List payment methods |
+| POST | `/v2/form` | WebPay hosted payment page (redirect integration) |
+| POST | `/v2/form/{order_number}/complete` | Complete hosted payment (fires signed callback, redirects) |
+| POST | `/transactions/{order_number}/{capture\|refund\|void}.xml` | XML transaction management |
 
 ## Features
 
@@ -103,6 +106,7 @@ These endpoints exist only for test setup and don't require auth:
 | Method | Path | Description |
 |--------|------|-------------|
 | POST | `/__reset` | Clear all state |
+| POST | `/__callback-sink` | Records signed callbacks (inspect via `/__state`) |
 | GET | `/__state` | Dump full server state as JSON |
 | POST | `/v2/customers/{uuid}/payment-methods` | Seed a payment method |
 
@@ -127,3 +131,13 @@ $this->seedPaymentMethod($customerUuid, [
 | `MockServerTrait.php` | PHPUnit trait — starts/stops server, helpers |
 | `MockBaseUrlClient.php` | HTTP client wrapper — rewrites URLs to mock |
 | `IntegrationTest.php` | 27 integration tests covering all endpoints |
+
+## WebPay form flow
+
+The mock also simulates the redirect integration end to end. POST the signed
+form (digest `SHA512(key + order_number + amount + currency)`) to `/v2/form`;
+the returned page has `data-mock-pay` and `data-mock-decline` buttons.
+Completing fires a `WP3-callback` signed callback at `callback_url_override`
+and 303-redirects to the success/cancel URL. The merchant key for digest
+verification and callback signing comes from the `MONRI_MOCK_MERCHANT_KEY`
+environment variable (default `key`). See `FormFlowIntegrationTest`.

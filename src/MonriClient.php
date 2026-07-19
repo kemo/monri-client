@@ -9,6 +9,7 @@ use Kemo\Monri\Api\Customers;
 use Kemo\Monri\Api\Payments;
 use Kemo\Monri\Api\RequestSigner;
 use Kemo\Monri\Api\Tokens;
+use Kemo\Monri\Api\Transactions;
 use Kemo\Monri\Exception\MonriException;
 use Kemo\Monri\Http\CurlHttpClient;
 use Kemo\Monri\Http\HttpClientInterface;
@@ -22,6 +23,7 @@ final class MonriClient
     private ?Customers $customers = null;
     private ?Tokens $tokens = null;
     private ?Callbacks $callbacks = null;
+    private ?Transactions $transactions = null;
 
     public function __construct(
         private readonly Config $config,
@@ -82,6 +84,14 @@ final class MonriClient
     public function tokens(): Tokens
     {
         return $this->tokens ??= new Tokens($this->config);
+    }
+
+    public function transactions(): Transactions
+    {
+        return $this->transactions ??= new Transactions(
+            $this->config,
+            $this->httpClient,
+        );
     }
 
     public function callbacks(): Callbacks
